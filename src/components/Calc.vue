@@ -27,14 +27,28 @@
     </div>
     <br />
     <div class="chekboks">
-      <input type="checkbox" id="checkbox" v-model="keyboards" />
+      <input type="checkbox" id="checkbox" v-model="isShowKeyboards" />
       <label> отобразить экранную клавиатуру</label>
     </div>
     <br />
-    <div>
-      <button for="checkbox" v-for="item in keyboards" v-bind:key="item">
+    <div v-if="isShowKeyboards">
+      <button
+        v-for="item in keyboards"
+        v-bind:key="item"
+        v-bind:title="item"
+        @click="addSymbol(item)"
+      >
         {{ item }}
       </button>
+      <button @click="backspace">&#8592;</button>
+    </div>
+    <br />
+    <div>
+      <input type="radio" id="one" value="operand1" v-model="picked" />
+      <label for="one">Операнд 1</label>
+      <input type="radio" id="two" value="operand2" v-model="picked" />
+      <label for="two">Операнд 2</label>
+      <br />
     </div>
   </div>
 </template>
@@ -44,7 +58,9 @@ export default {
   name: "Calculator",
   data() {
     return {
-      keyboards: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, "←"],
+      keyboards: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      isShowKeyboards: false,
+      picked: "",
       operands: ["+", "-", "/", "*", "%", "^"],
       operand1: 0,
       operand2: 0,
@@ -98,6 +114,20 @@ export default {
         case "^":
           this.degree();
           break;
+      }
+    },
+    addSymbol(data) {
+      if (this[this.picked] === 0) {
+        this[this.picked] = +data;
+      } else {
+        this[this.picked] = parseInt(this[this.picked] + data);
+      }
+    },
+    backspace() {
+      if (this[this.picked] < 10) {
+        this[this.picked] = 0;
+      } else {
+        this[this.picked] = parseInt(("" + this[this.picked]).slice(0, -1));
       }
     },
   },
