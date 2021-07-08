@@ -5,62 +5,88 @@
     </div>
     <div>
       <button @click="clicked = !clicked">Add new cost</button>
-      <AddPaymetForm @addNewPayment="addNewPaymentData" v-show="clicked" />
+      <AddPaymetForm
+        @addNewPayment="addNewPaymentData"
+        v-show="clicked"
+        :category-list="categorylist"
+      />
     </div>
-    <br />
-    <div class="wrapper"><PaymentsDisplay :items="paymetslist" /></div>
+    <div class="wrapper">
+      <PaymentsDisplay :items="currentElements" />
+    </div>
+    <Pagination
+      :length="paymetslistLength"
+      @changePage="onPaginate"
+      :count="count"
+      :cur="page"
+    />
   </div>
 </template>
 
 
 
 <script>
+import { mapMutations, mapGetters, mapActions } from "vuex";
 import AddPaymetForm from "./components/AddPaymentForm.vue";
 import PaymentsDisplay from "./components/PaymentsDisplay.vue";
+import Pagination from "./components/Pagination.vue";
 
 export default {
   name: "App",
   components: {
     AddPaymetForm,
     PaymentsDisplay,
+    Pagination,
   },
   data() {
     return {
       clicked: 0,
-      paymetslist: [],
+      page: 1,
+      count: 10,
+      // paymetslist: [],
     };
   },
   methods: {
-    addNewPaymentData(data) {
-      this.paymetslist = [...this.paymetslist, data];
+    ...mapMutations(["setPaymentsListData", "addDataToPaymentList"]),
+    ...mapActions({
+      fetchListData: "fetchData",
+    }),
+    addNewPaymentData(value) {
+      this.addDataToPaymentList(value);
     },
-    fetsData() {
-      return [
-        {
-          date: "04.07.2021",
-          category: "1",
-          value: 180,
-        },
-        {
-          date: "04.06.2021",
-          category: "2",
-          value: 1800,
-        },
-        {
-          date: "04.05.2021",
-          category: "3",
-          value: 18000,
-        },
-        {
-          date: "04.04.2021",
-          category: "4",
-          value: 180000,
-        },
-      ];
+    onPaginate(p) {
+      this.page = p;
+    },
+  },
+  computed: {
+    ...mapGetters(["getFullPaymentValue"]),
+    getFullValue() {
+      return this.getFullPaymentValue;
+    },
+    paymetslist() {
+      return this.$store.getters.getPaymentList;
+    },
+    paymetslistLength() {
+      return this.$store.getters.getPaymentList.length;
+    },
+    categorylist() {
+      return this.$store.getters.getCategoryList;
+    },
+    currentElements() {
+      const { count, page } = this;
+      return this.paymetslist.slice(
+        count * (page - 1),
+        count * (page - 1) + count
+      );
     },
   },
   created() {
-    this.paymetslist = this.fetsData();
+    // this.paymetslist = this.fetchData();
+    // this.$store.commit("setPaymentsListData", this.fetchData());
+    if (!this.fetchListData.length) {
+      this.fetchListData();
+    }
+    this.$store.dispatch("fetchCategoryList");
   },
 };
 </script>

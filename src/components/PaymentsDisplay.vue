@@ -1,18 +1,22 @@
 <template>
-  <div class="list">
-    <div :class="$style.top_list">
-      <span>#</span><span>Date</span><span>Category</span><span>Price</span>
-    </div>
-    <div :class="$style.list" v-for="(item, idx) in items" :key="idx">
-      <div>{{ idx + 1 }}.</div>
-      <div>{{ item.date }}</div>
-      <div>{{ item.category }}</div>
-      <div>{{ item.value }}</div>
+  <div class="payment-list">
+    <div>Total sum = {{ getFullValue }}</div>
+    <div class="list">
+      <div :class="$style.top_list">
+        <span>#</span><span>Date</span><span>Category</span><span>Price</span>
+      </div>
+      <div :class="$style.list" v-for="(item, idx) in items" :key="idx">
+        <div>{{ item.id }}.</div>
+        <div>{{ item.date }}</div>
+        <div>{{ item.category }}</div>
+        <div>{{ item.value }}</div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 export default {
   name: "PaymentsDisplay",
   props: {
@@ -20,6 +24,12 @@ export default {
       type: Array,
       defoult: () => [],
       required: true,
+    },
+  },
+  computed: {
+    ...mapGetters(["getFullPaymentValue"]),
+    getFullValue() {
+      return this.getFullPaymentValue;
     },
   },
 };
