@@ -3,82 +3,56 @@
     <div :class="$style.header">
       <h1>My personal cost</h1>
     </div>
-    <div>
-      <button @click="clicked = !clicked">Add new cost</button>
-      <AddPaymetForm
-        @addNewPayment="addNewPaymentData"
-        v-show="clicked"
-        :category-list="categorylist"
-      />
+    <div class="menu">
+      <a href="#" @click="goToPage('about')">About</a> /
+      <a href="#" @click="goToPage('dashboard')">Dashboard</a>
+      <!-- <router-link to="/about"> About </router-link> /
+      <router-link to="/dashboard"> Dashboard </router-link> -->
+      <!-- <a href="about">About</a> / <a href="dashboard">Dashboard</a> /
+      <a href="404">404</a> -->
     </div>
-    <div class="wrapper">
-      <PaymentsDisplay :items="currentElements" />
+    <br />
+    <div class="content">
+      <router-view />
+      <!-- <PageAbout v-if="pageName === 'about'" />
+      <PageDashboard v-if="pageName === 'dashboard'" />
+      <Page404 v-if="pageName === '404'" /> -->
     </div>
-    <Pagination
-      :length="paymetslistLength"
-      @changePage="onPaginate"
-      :count="count"
-      :cur="page"
-    />
   </div>
 </template>
 
 
 
 <script>
-import { mapMutations, mapGetters, mapActions } from "vuex";
-import AddPaymetForm from "./components/AddPaymentForm.vue";
-import PaymentsDisplay from "./components/PaymentsDisplay.vue";
-import Pagination from "./components/Pagination.vue";
+// import PageAbout from "./page/PageAbout.vue";
+// import PageDashboard from "./page/PageDashboard.vue";
+// import Page404 from "./page/Page404.vue";
 
 export default {
   name: "App",
   components: {
-    AddPaymetForm,
-    PaymentsDisplay,
-    Pagination,
+    // PageAbout,
+    // PageDashboard,
+    // Page404,
   },
   data() {
     return {
       clicked: 0,
       page: 1,
       count: 10,
+      pageName: "",
       // paymetslist: [],
     };
   },
   methods: {
-    ...mapMutations(["setPaymentsListData", "addDataToPaymentList"]),
-    ...mapActions({
-      fetchListData: "fetchData",
-    }),
-    addNewPaymentData(value) {
-      this.addDataToPaymentList(value);
+    goToPage(page) {
+      this.$router.push({
+        name: page,
+      });
     },
-    onPaginate(p) {
-      this.page = p;
-    },
-  },
-  computed: {
-    ...mapGetters(["getFullPaymentValue"]),
-    getFullValue() {
-      return this.getFullPaymentValue;
-    },
-    paymetslist() {
-      return this.$store.getters.getPaymentList;
-    },
-    paymetslistLength() {
-      return this.$store.getters.getPaymentList.length;
-    },
-    categorylist() {
-      return this.$store.getters.getCategoryList;
-    },
-    currentElements() {
-      const { count, page } = this;
-      return this.paymetslist.slice(
-        count * (page - 1),
-        count * (page - 1) + count
-      );
-    },
+    // setPage() {
+    //   this.pageName = location.pathname.slice(1);
+    // },
   },
   created() {
     // this.paymetslist = this.fetchData();
@@ -87,6 +61,25 @@ export default {
       this.fetchListData();
     }
     this.$store.dispatch("fetchCategoryList");
+  },
+  mounted() {
+    // this.setPage();
+    // const links = document.querySelectorAll("a");
+    // links.forEach((link) => {
+    //   link.addEventListener("click", (event) => {
+    //     event.preventDefault();
+    //     history.pushState({}, "", link.href);
+    //     this.setPage();
+    //   });
+    // });
+    // window.addEventListener("popstate", () => {
+    //   this.setPage();
+    // });
+    // this.setPage();
+    // window.addEventListener("hashchange", () => {
+    //   console.log("hashchange");
+    //   this.setPage();
+    // });
   },
 };
 </script>

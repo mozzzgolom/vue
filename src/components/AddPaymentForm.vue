@@ -15,7 +15,7 @@
       <input placeholder="amout" type="number" v-model.number="value" />
     </div>
 
-    <button @click="onClick">Save</button>
+    <button v-bind:disabled="category === ''" @click="onClick">Save</button>
   </div>
 </template>
 
@@ -28,6 +28,7 @@ export default {
       date: "",
       category: "",
       value: 0,
+      id: "",
     };
   },
   methods: {
@@ -52,6 +53,27 @@ export default {
       this.category = "";
       this.value = 0;
     },
+    acceptQuickPayment() {
+      if (this.$route.params.category) {
+        this.category = this.$route.params.category;
+        this.date || this.getCurrentDate();
+      }
+
+      if (this.$route.query.value) {
+        this.value = this.$route.query.value;
+        setTimeout(() => {
+          this.onClick();
+        }, 300);
+      }
+    },
+  },
+  watch: {
+    $route() {
+      this.acceptQuickPayment();
+    },
+  },
+  mounted() {
+    this.acceptQuickPayment();
   },
 };
 </script>

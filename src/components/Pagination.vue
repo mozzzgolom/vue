@@ -3,7 +3,7 @@
     <div class="left" @click="onClick(cur - 1)">-</div>
     <div
       class="pages"
-      :class="{ active: curr === i }"
+      :class="{ active: cur === i }"
       v-for="i in pagesCount"
       :key="i"
       @click="onClick(i)"

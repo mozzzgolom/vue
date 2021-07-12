@@ -6,7 +6,7 @@ Vue.use(vuex)
 export default new vuex.Store({
     state:{
         paymentsList:[],
-        category:[]
+        category:[],
     },
     mutations:{
         setPaymentsListData(state, payload) {
@@ -18,7 +18,7 @@ export default new vuex.Store({
         },
         addCategory(state, payload) {
             state.category = payload
-        }
+        },
     },
     getters:{
         getPaymentList: state => state.paymentsList,
@@ -58,6 +58,7 @@ export default new vuex.Store({
             })
             .then (res=> dispatch('someAction', res))
         }
+
     }
 
 })
