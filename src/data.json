@@ -1,6 +1,6 @@
 [
   {
-    "amount": 500,
+    "value": 500,
     "category": "House",
     "date": "03.20.2021",
     "id": 11
@@ -12,25 +12,25 @@
     "id": 10
   },
   {
-    "amount": 56,
+    "value": 56,
     "category": "Sport",
     "date": "07.02.2021",
     "id": 7
   },
   {
-    "amount": 100,
+    "value": 100,
     "category": "Food",
     "date": "06.27.2021",
     "id": 8
   },
   {
-    "amount": 2400,
+    "value": 2400,
     "category": "House",
     "date": "06.23.2021",
     "id": 9
   },
   {
-    "amount": 1000,
+    "value": 1000,
     "category": "House",
     "date": "06.23.2021",
     "id": 12
@@ -39,36 +39,36 @@
     "id": 6,
     "date": "03.25.2020",
     "category": "Food",
-    "amount": 200
+    "value": 200
   },
   {
     "id": 5,
     "date": "03.24.2020",
     "category": "Education",
-    "amount": 1500
+    "value": 1500
   },
   {
     "id": 4,
     "date": "03.23.2020",
     "category": "Entertaiment",
-    "amount": 969
+    "value": 969
   },
   {
     "id": 3,
     "date": "03.22.2020",
     "category": "Sport",
-    "amount": 450
+    "value": 450
   },
   {
     "id": 2,
     "date": "03.21.2020",
     "category": "Navigation",
-    "amount": 50
+    "value": 50
   },
   {
     "id": 1,
     "date": "03.20.2020",
     "category": "Food",
-    "amount": 169
+    "value": 169
   }
 ]
