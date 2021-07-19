@@ -1,121 +1,131 @@
 <template>
   <div>
-    <div>
-      <button @click="clicked = !clicked">Add new cost</button>
-      <div class="autpaiments">
-        <button @click="quickPayment('food', 200)" v-show="clicked">
-          Add - Food / 200
-        </button>
-        <br />
-        <button @click="quickPayment('transport', 50)" v-show="clicked">
-          Add - Transport / 50
-        </button>
-        <br />
-        <button @click="quickPayment('education', 2000)" v-show="clicked">
-          Add - Education / 2000
-        </button>
-      </div>
-      <AddPaymetForm
-        @addNewPayment="addNewPaymentData"
-        v-show="clicked"
-        :category-list="categorylist"
-      />
-    </div>
-
-    <div class="wrapper">
-      <PaymentsDisplay :items="currentElements" />
-    </div>
-    <Pagination
-      :length="paymetslistLength"
-      @changePage="onPaginate"
-      :count="count"
-      :cur="page"
-    />
+    <button @click="showPaymentForm = !showPaymentForm">ADD NEW COST+</button>
+    <br />
+    <button @click="quickPayment('Food', 200)" v-show="showPaymentForm">
+      Quick payment - Food 200
+    </button>
+    <br />
+    <button @click="quickPayment('Transport', 50)" v-show="showPaymentForm">
+      Quick payment - Transport 50
+    </button>
+    <br />
+    <button
+      @click="quickPayment('Entertainment', 2000)"
+      v-show="showPaymentForm"
+    >
+      Quick payment - Entertainment 2000
+    </button>
+    <transition name="fade">
+      <AddPaymentForm @addNewPayment="newPayment" v-show="showPaymentForm" />
+    </transition>
+    <PaymentsList :payments="currentPagePayments" />
+    <Pagination :paymentsPerPage="paymentsPerPage" @pageChange="changePage" />
   </div>
 </template>
 
 <script>
-import { mapMutations, mapGetters, mapActions } from "vuex";
-import AddPaymetForm from "../components/AddPaymentForm.vue";
-import PaymentsDisplay from "../components/PaymentsDisplay.vue";
+import { mapGetters, mapActions } from "vuex";
+
+import PaymentsList from "../components/PaymentsList.vue";
+import AddPaymentForm from "../components/AddPaymentForm.vue";
 import Pagination from "../components/Pagination.vue";
+
 export default {
   name: "PageDashboard",
+
   components: {
-    AddPaymetForm,
-    PaymentsDisplay,
+    PaymentsList,
+    AddPaymentForm,
     Pagination,
   },
+
   data() {
     return {
-      clicked: false,
-      page: 1,
-      count: 10,
-      pageName: "",
+      paymentsPerPage: 5,
+      currentPage: this.$route.params.page || 1,
+      showPaymentForm: this.openPaymentForm,
     };
   },
+
+  props: {
+    openPaymentForm: {
+      type: Boolean,
+      default: () => false,
+    },
+  },
+
+  computed: {
+    ...mapGetters({ paymentsList: "getPayments" }),
+
+    currentPagePayments() {
+      const { currentPage, paymentsList, paymentsPerPage } = this;
+      let startIndex = (currentPage - 1) * paymentsPerPage;
+      const paymentsToDisplay = paymentsList.slice(
+        startIndex,
+        startIndex + paymentsPerPage
+      );
+      return paymentsToDisplay;
+    },
+  },
+
   methods: {
-    ...mapMutations(["setPaymentsListData", "addDataToPaymentList"]),
-    ...mapActions({
-      fetchListData: "fetchData",
-    }),
-    addNewPaymentData(value) {
-      this.addDataToPaymentList(value);
+    ...mapActions([
+      "fetchData",
+      "addNewPayment",
+      "editPayment",
+      "deletePayment",
+    ]),
+
+    newPayment(newPayment) {
+      this.addNewPayment(newPayment);
+      if (this.$route.path !== "/dashboard") {
+        this.$router.push({ path: "/dashboard" });
+      }
     },
-    onPaginate(p) {
-      this.page = p;
+
+    changePage(number) {
+      this.currentPage = number;
+      this.$router.push({ path: `/dashboard/${number}` });
     },
-    goToPage(page) {
-      this.$router.push({
-        name: page,
-      });
-    },
+
     quickPayment(category, value) {
       this.$router.push({ path: `/add/payment/${category}?value=${value}` });
     },
-    // setPage() {
-    //   this.pageName = location.pathname.slice(1);
-    // },
-  },
-  computed: {
-    ...mapGetters(["getFullPaymentValue"]),
-    getFullValue() {
-      return this.getFullPaymentValue;
+
+    removePayment(payment) {
+      this.deletePayment(payment);
     },
-    paymetslist() {
-      return this.$store.getters.getPaymentList;
-    },
-    paymetslistLength() {
-      return this.$store.getters.getPaymentList.length;
-    },
-    categorylist() {
-      return this.$store.getters.getCategoryList;
-    },
-    currentElements() {
-      const { count, page } = this;
-      return this.paymetslist.slice(
-        count * (page - 1),
-        count * (page - 1) + count
-      );
+
+    updatePayment(payment) {
+      this.editPayment(payment);
     },
   },
+
   created() {
-    // this.paymetslist = this.fetchData();
-    // this.$store.commit("setPaymentsListData", this.fetchData());
-    if (!this.fetchListData.length) {
-      this.fetchListData();
+    if (!this.paymentsList.length) {
+      this.fetchData(this.currentPage, this.paymentsPerPage);
     }
-    this.$store.dispatch("fetchCategoryList");
+  },
+
+  mounted() {
+    this.$context.EventBus.$on("deletepayment", this.removePayment);
+    this.$context.EventBus.$on("editpayment", this.updatePayment);
   },
 };
 </script>
 
-<style lang="scss" module scoped>
-button {
-  padding: 10px 20px;
-  border: none;
-  background-color: seagreen;
-  color: white;
-  margin-bottom: 10px;
-}
+<style lang="sass" module>
+button
+  padding: 10px 20px
+  border: none
+  background-color: seagreen
+  color: white
+  margin-bottom: 10px
+
+.fade-enter-active, .fade-leave-active
+  transition: opacity .3s
+
+.fade-enter, .fade-leave-to
+  opacity: 0
 </style>

@@ -1,97 +1,105 @@
 <template>
-  <div class="payment-form">
-    <div><input placeholder="date" type="text" v-model.trim="date" /></div>
-    <!-- <div>
-      <input placeholder="category" type="text" v-model.trim="category" />
-    </div> -->
+  <div>
+    <div>
+      <input type="date" placeholder="Date" v-model="date" />
+    </div>
     <div>
       <select v-model="category">
-        <option v-for="(item, idx) in categoryList" :value="item" :key="idx">
-          {{ item }}
+        <option
+          v-for="(option, index) in getCategoriesList"
+          :value="option"
+          :key="index"
+        >
+          {{ option }}
         </option>
       </select>
     </div>
-    <div>
-      <input placeholder="amout" type="number" v-model.number="value" />
-    </div>
 
-    <button v-bind:disabled="category === ''" @click="onClick">Save</button>
+    <div>
+      <input type="number" placeholder="value" v-model.number="value" />
+    </div>
+    <div>
+      <button
+        class="btn_save"
+        v-bind:disabled="category === ''"
+        @click="sendPayment"
+      >
+        Save
+      </button>
+    </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 export default {
-  name: "AddPaymetForm",
-  props: ["categoryList"],
+  name: "AddPaymentForm",
   data() {
     return {
-      date: "",
+      value: "",
       category: "",
-      value: 0,
-      id: "",
+      date: new Date().toISOString().slice(0, 10),
     };
   },
+
+  computed: {
+    ...mapGetters(["getCategoriesList", "getTotalPayments"]),
+  },
+
   methods: {
-    getCurrentDate() {
-      const today = new Date();
-      const d = ("0" + today.getDate()).slice(-2);
-      const m = ("0" + (today.getMonth() + 1)).slice(-2);
-      const y = today.getFullYear();
-      return `${d}.${m}.${y}`;
-    },
-    onClick() {
-      // console.log("saved");
-      const { value, category } = this;
+    sendPayment() {
+      const { category, value } = this;
+
       const data = {
-        date: this.date || this.getCurrentDate(),
-        category,
+        id: Date.now(new Date()),
         value,
+        category,
+        date: this.date,
       };
-      console.log(data);
       this.$emit("addNewPayment", data);
       this.date = "";
       this.category = "";
       this.value = 0;
     },
+
     acceptQuickPayment() {
       if (this.$route.params.category) {
         this.category = this.$route.params.category;
-        this.date || this.getCurrentDate();
       }
 
       if (this.$route.query.value) {
         this.value = this.$route.query.value;
-        setTimeout(() => {
-          this.onClick();
-        }, 300);
+        this.sendPayment();
       }
     },
   },
+
   watch: {
     $route() {
       this.acceptQuickPayment();
     },
   },
+
   mounted() {
     this.acceptQuickPayment();
   },
 };
 </script>
 
-<style lang="scss" scoped module>
-button {
-  padding: 10px 45px;
-  border: none;
-}
-button:enabled {
-  background-color: seagreen;
-  color: white;
-}
-input {
-  margin-bottom: 5px;
-}
-
-input:first-child {
-  margin-top: 5px;
-}
+<style lang='sass'>
+div
+  padding-bottom: 5px
+input[type=date]
+  padding: 5px
+select
+  padding: 7px 32px 7px 10px
+input[type=number]
+  padding: 5px
+  width: 140px
+.btn_save:disabled
+  background-color: grey
+  color: black
+.btn_save:enabled
+  background-color: seagreen
+  color: white
 </style>

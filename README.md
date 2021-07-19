@@ -1,4 +1,4 @@
-# first-project
+# budget_tracker
 
 ## Project setup
 ```
