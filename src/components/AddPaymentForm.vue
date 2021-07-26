@@ -1,34 +1,27 @@
 <template>
-  <div>
-    <div>
-      <input type="date" placeholder="Date" v-model="date" />
-    </div>
-    <div>
-      <select v-model="category">
-        <option
-          v-for="(option, index) in getCategoriesList"
-          :value="option"
-          :key="index"
-        >
-          {{ option }}
-        </option>
-      </select>
-    </div>
+  <v-card class="pa-10">
+    <h2 class="mb-4 text-h4">Add New Payment</h2>
+    <v-menu
+      :close-on-content-click="false"
+      transition="scale-transition"
+      offset-y
+      min-width="auto"
+    >
+      <template #activator="{ on }">
+        <v-text-field v-model="date" label="Date" v-on="on"></v-text-field>
+      </template>
+      <v-date-picker v-model="date"></v-date-picker>
+    </v-menu>
 
-    <div>
-      <input type="number" placeholder="value" v-model.number="value" />
-    </div>
-    <div>
-      <button
-        class="btn_save"
-        v-bind:disabled="category === ''"
-        @click="sendPayment"
-      >
-        Save
-      </button>
-    </div>
-  </div>
+    <v-select :items="getCategoriesList" label="Category" v-model="category">
+    </v-select>
+
+    <v-text-field label="Value" v-model.number="value"></v-text-field>
+    <v-btn @click="sendPayment">Save</v-btn>
+  </v-card>
 </template>
+
+
 
 <script>
 import { mapGetters } from "vuex";
@@ -87,19 +80,4 @@ export default {
 </script>
 
 <style lang='sass'>
-div
-  padding-bottom: 5px
-input[type=date]
-  padding: 5px
-select
-  padding: 7px 32px 7px 10px
-input[type=number]
-  padding: 5px
-  width: 140px
-.btn_save:disabled
-  background-color: grey
-  color: black
-.btn_save:enabled
-  background-color: seagreen
-  color: white
 </style>

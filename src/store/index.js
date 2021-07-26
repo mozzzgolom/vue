@@ -63,6 +63,20 @@ export default new Vuex.Store({
 
     getCategoriesList(state) {
       return state.categories
+    },
+    getPieChartData(state) {
+      const data = []
+      state.categories.forEach(category => {
+        const categoryData = [category, 0]
+        state.paymentsList.forEach(payment => {
+          if (payment.category === category) {
+            categoryData[1] += payment.value
+          }
+        });
+        if (categoryData[1] > 0) data.push(categoryData);
+
+      });
+      return data
     }
   },
   actions: {

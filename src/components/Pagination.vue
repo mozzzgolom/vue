@@ -1,8 +1,11 @@
 <template>
   <div>
-    <button v-for="n in pages" :key="n" @click="changePage(n)">
-      {{ n }}
-    </button>
+    <v-pagination
+      v-model="page"
+      :length="pages"
+      @input="changePage"
+      color="teal"
+    ></v-pagination>
   </div>
 </template>
 

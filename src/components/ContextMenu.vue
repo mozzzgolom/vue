@@ -1,16 +1,27 @@
 <template>
   <div class="wrapper">
-    <div class="menu">
-      <button
-        class="menu-btn"
-        v-for="(action, index) in actions"
-        :key="index"
-        @click="choseAction(action)"
-      >
-        {{ action.name }}
-      </button>
+    <v-btn
+      plain
+      small
+      v-for="action in actions"
+      :key="action.name"
+      @click="choseAction(action, $event)"
+    >
+      {{ action.name }}
+    </v-btn>
+    <v-btn plain small color="error" @click="$context.hide()">Cancel </v-btn>
+
+    <v-menu
+      offset-x
+      :close-on-content-click="false"
+      :close-on-click="true"
+      v-model="showContextWindow"
+      :position-x="x"
+      :position-y="y"
+      content-class="elevation-2"
+    >
       <component :is="contextWindowContent" :item="item" :settings="settings" />
-    </div>
+    </v-menu>
   </div>
 </template>
 
@@ -33,17 +44,25 @@ export default {
     return {
       contextWindowContent: "",
       settings: null,
+      showContextWindow: false,
+      x: 0,
+      y: 0,
     };
   },
 
   methods: {
-    choseAction(action) {
+    choseAction(action, e) {
       this.$set(this, "settings", action);
       this.contextWindowContent = action.comp;
+      this.x = e.clientX;
+      this.y = e.clientY;
+      if (this.showContextWindow) return;
+      this.showContextWindow = true;
     },
 
     onHideContentWindow() {
       this.contextWindowContent = "";
+      this.showContextWindow = false;
     },
   },
 
@@ -53,46 +72,5 @@ export default {
 };
 </script>
 
-<style scoped lang="sass">
-i
-  font-size: 18px
-
-.icon-btn
-  width: 15px
-  padding: 5px
-  align-self: flex-end
-
-.icon-btn:hover
-  background-color: #eaeaea
-
-.wrapper
-  position: relative
-  max-width: 150px
-  display: flex
-  flex-direction: column
-
-button
-  display: flex
-  justify-content: center
-  border: none
-  cursor: pointer
-  background-color: transparent
-
-.menu-btn
-  height: 25px
-  width: 100%
-  justify-content: start
-  color: black
-
-.menu-btn:hover
-  background-color: #eaeaea
-
-.menu
-  position: absolute
-  z-index: 100
-  left: 50%
-  top: 100%
-  padding: 10px 0
-  box-shadow: 0px 0px 12px 0px rgba(0,0,0,0.49)
-  background-color: #fff
+<style>
 </style>

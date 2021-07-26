@@ -1,31 +1,45 @@
 <template>
   <div>
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Date</th>
-          <th>Category</th>
-          <th>Value</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(payment, index) in paymentsList" :key="payment.number">
-          <td>{{ payment.number }}</td>
-          <td>{{ payment.date }}</td>
-          <td>{{ payment.category }}</td>
-          <td>{{ payment.value }}</td>
-          <button class="icon-btn" @click="showContextMenu(payment)">
-            <i class="fas fa-ellipsis-v"></i>
-          </button>
-          <ContextMenu
-            v-if="showMenuForID === payment.id"
-            :actions="contextActions"
-            :item="{ ...payments[index] }"
-          />
-        </tr>
-      </tbody>
-    </table>
+    <v-row class="font-weight-bold border-bottom">
+      <v-col cols="1">#</v-col>
+      <v-col cols="4">Date</v-col>
+      <v-col cols="4">Category</v-col>
+      <v-col cols="2" class="px-0">Value</v-col>
+      <v-spacer></v-spacer>
+    </v-row>
+
+    <v-row
+      v-for="(payment, index) in paymentsList"
+      :key="payment.number"
+      class="border-bottom"
+    >
+      <v-col cols="1">{{ payment.number }}</v-col>
+      <v-col cols="4">{{ payment.date }}</v-col>
+      <v-col cols="4">{{ payment.category }}</v-col>
+      <v-col cols="2">
+        {{ payment.value }}
+      </v-col>
+      <v-col cols="1">
+        <v-btn small icon @click="showContextMenu(payment, $event)">
+          <v-icon>mdi-dots-vertical</v-icon>
+        </v-btn>
+      </v-col>
+
+      <v-menu
+        :close-on-click="false"
+        :close-on-content-click="false"
+        content-class="elevation-1"
+        v-model="displayMenu"
+        :position-x="x"
+        :position-y="y"
+      >
+        <ContextMenu
+          v-if="showMenuForID === payment.id"
+          :actions="contextActions"
+          :item="{ ...payments[index] }"
+        />
+      </v-menu>
+    </v-row>
   </div>
 </template>
 
@@ -50,8 +64,11 @@ export default {
         { name: "Edit", comp: "EditPaymentForm", itemName: "Payment" },
         { name: "Delete", comp: "ConfirmWindow", itemName: "Payment" },
       ],
+      displayMenu: false,
       showMenuForID: null,
       contextActions: null,
+      x: 0,
+      y: 0,
     };
   },
 
@@ -67,12 +84,14 @@ export default {
   },
 
   methods: {
-    showContextMenu(payment) {
-      if (!this.showMenuForID) {
-        this.$context.show(payment, this.paymentActions);
-      } else {
-        this.$context.hide();
+    showContextMenu(payment, e) {
+      this.x = e.clientX + 10;
+      this.y = e.clientY;
+      if (this.showMenuForID === payment.id && this.displayMenu) {
+        this.displayMenu = false;
+        return;
       }
+      this.$context.show(payment, this.paymentActions);
     },
   },
 
@@ -80,10 +99,12 @@ export default {
     this.$context.EventBus.$on("show", (data) => {
       this.contextActions = data.actions;
       this.showMenuForID = data.item.id;
+      this.displayMenu = true;
     });
 
     this.$context.EventBus.$on("hide", () => {
       this.showMenuForID = null;
+      this.displayMenu = false;
     });
   },
 };

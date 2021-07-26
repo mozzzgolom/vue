@@ -1,26 +1,64 @@
 <template>
   <div>
-    <button @click="showPaymentForm = !showPaymentForm">ADD NEW COST+</button>
-    <br />
-    <button @click="quickPayment('Food', 200)" v-show="showPaymentForm">
-      Quick payment - Food 200
-    </button>
-    <br />
-    <button @click="quickPayment('Transport', 50)" v-show="showPaymentForm">
-      Quick payment - Transport 50
-    </button>
-    <br />
-    <button
-      @click="quickPayment('Entertainment', 2000)"
-      v-show="showPaymentForm"
-    >
-      Quick payment - Entertainment 2000
-    </button>
-    <transition name="fade">
-      <AddPaymentForm @addNewPayment="newPayment" v-show="showPaymentForm" />
-    </transition>
-    <PaymentsList :payments="currentPagePayments" />
-    <Pagination :paymentsPerPage="paymentsPerPage" @pageChange="changePage" />
+    <v-container>
+      <v-row>
+        <v-col md="6" sm="12">
+          <h2 class="text-h3 mb-6">My Payments Tracker</h2>
+          <v-dialog v-model="showPaymentForm" width="500">
+            <template #activator="{ on }">
+              <v-btn color="teal" dark large v-on="on" class="mb-6">
+                <v-icon left>mdi-plus-thick</v-icon>
+                ADD NEW PAYMENT
+              </v-btn>
+            </template>
+
+            <v-card>
+              <AddPaymentForm @addNewPayment="newPayment" />
+            </v-card>
+            <v-card>
+              <v-btn
+                @click="quickPayment('Food', 200)"
+                v-show="showPaymentForm"
+              >
+                Quick payment - Food 200
+              </v-btn>
+              <v-btn
+                @click="quickPayment('Transport', 50)"
+                v-show="showPaymentForm"
+              >
+                Quick payment - Transport 50
+              </v-btn>
+              <v-btn
+                @click="quickPayment('Entertainment', 2000)"
+                v-show="showPaymentForm"
+              >
+                Quick payment - Entertainment 2000
+              </v-btn>
+            </v-card>
+          </v-dialog>
+
+          <PaymentsList :payments="currentPagePayments" />
+          <Pagination
+            :paymentsPerPage="paymentsPerPage"
+            @pageChange="changePage"
+            :currentPage="currentPage"
+            class="mt-6"
+          />
+        </v-col>
+        <v-col md="6" sm="12">
+          <h2 class="text-h5 text-center">Payments by categories</h2>
+          <div class="chart">
+            <pie-chart
+              width="350px"
+              height="350px"
+              :donut="true"
+              :data="pieChartData"
+              legend="right"
+            ></pie-chart>
+          </div>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 
@@ -56,7 +94,10 @@ export default {
   },
 
   computed: {
-    ...mapGetters({ paymentsList: "getPayments" }),
+    ...mapGetters({
+      paymentsList: "getPayments",
+      pieChartData: "getPieChartData",
+    }),
 
     currentPagePayments() {
       const { currentPage, paymentsList, paymentsPerPage } = this;
@@ -115,17 +156,12 @@ export default {
 };
 </script>
 
-<style lang="sass" module>
-button
-  padding: 10px 20px
-  border: none
-  background-color: seagreen
-  color: white
-  margin-bottom: 10px
-
+<style lang="sass">
 .fade-enter-active, .fade-leave-active
   transition: opacity .3s
-
 .fade-enter, .fade-leave-to
   opacity: 0
+.chart
+  display: flex
+  justify-content: center
 </style>
