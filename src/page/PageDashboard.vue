@@ -5,6 +5,17 @@
         <v-col md="6" sm="12">
           <h2 class="text-h3 mb-6">My Payments Tracker</h2>
           <v-dialog v-model="showPaymentForm" width="500">
+            <v-dialog width="500">
+              <template #activator="{ on }">
+                <v-btn color="teal" dark large v-on="on" class="mb-6">
+                  Add/del CATEGORIES
+                </v-btn>
+              </template>
+
+              <v-card>
+                <CategoriesList />
+              </v-card>
+            </v-dialog>
             <template #activator="{ on }">
               <v-btn color="teal" dark large v-on="on" class="mb-6">
                 <v-icon left>mdi-plus-thick</v-icon>
@@ -45,7 +56,7 @@
             class="mt-6"
           />
         </v-col>
-        <v-col md="6" sm="12">
+        <v-col md="5" sm="12">
           <h2 class="text-h5 text-center">Payments by categories</h2>
           <div class="chart">
             <pie-chart
@@ -68,6 +79,7 @@ import { mapGetters, mapActions } from "vuex";
 import PaymentsList from "../components/PaymentsList.vue";
 import AddPaymentForm from "../components/AddPaymentForm.vue";
 import Pagination from "../components/Pagination.vue";
+import CategoriesList from "../components/CategoriesList.vue";
 
 export default {
   name: "PageDashboard",
@@ -76,6 +88,7 @@ export default {
     PaymentsList,
     AddPaymentForm,
     Pagination,
+    CategoriesList,
   },
 
   data() {
